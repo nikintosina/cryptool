@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice Status Updates</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <h1> HFHSjfwkorfljefjlwdjfpadjflkjf</h1>
+</head>
+<body>
+    <h2>Invoice Status Updates:</h2>
+    <div id="updates"></div>
+
+    <script>
+        const socket = io('http://localhost:5000');
+
+        socket.on('connect', function() {
+            console.log('Connected to the server');
+            document.getElementById('updates').innerHTML += '<p>Connected to the server.</p>';
+        });
+
+        socket.on('update', function(msg) {
+            console.log('Update:', msg);
+            document.getElementById('updates').innerHTML += `<p>${msg}</p>`;
+        });
+    </script>
+</body>
+</html>
+
+
+
