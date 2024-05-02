@@ -5,7 +5,7 @@ import threading
 from invoice import Invoice  # Ensure your Invoice class is adapted to work with SocketIO
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")  # Allows all origins; be cautious with this in production
+socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
 
 class AsyncInvoice(Invoice):
     def __init__(self, provider_url, payout_wallet, socketio):
@@ -19,8 +19,13 @@ class AsyncInvoice(Invoice):
         # Emit to all connected clients by default
         self.socketio.emit('update', f"Send {amount_ether} ETH to {public_key}")
 
+        print(f"Send {amount_ether} ETH to {public_key}")
+
         await self.await_payment(public_key, amount_ether)
         self.socketio.emit('update', "Payment received. Transferring to payout wallet...")
+
+        print("Payment received. Transferring to payout wallet...")
+
         await self.transfer_to_payout_wallet(private_key, public_key)
 
 
@@ -46,7 +51,8 @@ def create_invoice_api():
     thread = threading.Thread(target=run_async_invoice)
     thread.start()
 
-    return jsonify({"message": "Invoice creation initiated"}), 20
+    return jsonify({"message": "Invoice creation initiated"}), 202  # Changed to 202
+
 
 @socketio.on('connect')
 def test_connect():
