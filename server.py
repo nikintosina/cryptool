@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import asyncio
 import threading
 from invoice import Invoice  # Ensure your Invoice class is adapted to work with SocketIO
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
 
 class AsyncInvoice(Invoice):
@@ -40,7 +42,6 @@ def create_invoice_api():
         return jsonify({"error": "Missing required parameters"}), 400
 
     eth_invoice = AsyncInvoice(provider_url, payout_wallet, socketio)
-
     def run_async_invoice():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -59,4 +60,4 @@ def test_connect():
     emit('my response', {'data': 'Connected'})
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True,allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
