@@ -1,16 +1,14 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import './App.css';
 
-const socket = io('http://127.0.0.1:5000');
+const socket = io('http://127.0.0.1:5000');  // Ensure this matches your backend URL
 
 function App() {
   const [status, setStatus] = useState('Waiting to create an invoice...');
-  const [invoiceAddress, setInvoiceAddress] = useState('');
-  const [amount, setAmount] = useState('');
   const [providerUrl, setProviderUrl] = useState('');
   const [payoutWallet, setPayoutWallet] = useState('');
+  const [amount, setAmount] = useState('');
 
   useEffect(() => {
     socket.on('update', (message) => {
@@ -22,33 +20,33 @@ function App() {
     };
   }, []);
 
-    const handleCreateInvoice = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/create_invoice', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            provider_url: providerUrl,
-            payout_wallet: payoutWallet,
-            amount_ether: amount,
-          }),
-        });
+  const handleCreateInvoice = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/create_invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',  // Ensure this header is present
+        },
+        body: JSON.stringify({
+          provider_url: providerUrl,
+          payout_wallet: payoutWallet,
+          amount_ether: amount,
+        }),
+      });
 
-        if (!response.ok) {
-          const data = await response.json();
-          setStatus(`Error: ${data.error}`);
-          return;
-        }
-
+      if (!response.ok) {
         const data = await response.json();
-        setStatus('Invoice creation initiated');
-      } catch (error) {
-        setStatus(`Fetch error: ${error.message}`);
+        setStatus(`Error: ${data.error}`);
+        return;
       }
-    };
 
+      const data = await response.json();
+      setStatus('Invoice creation initiated');
+    } catch (error) {
+      setStatus(`Fetch error: ${error.message}`);
+    }
+  };
 
   return (
     <div className="App">
