@@ -26,7 +26,6 @@ function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',  // Ensure this header is present
         },
         body: JSON.stringify({
           provider_url: providerUrl,
